@@ -53,7 +53,7 @@ export function getFiles(req: express.Request): filesUploadType {
 			// Add the file to upload
 			files.push({
 				fieldValue: file.fieldName,
-				filename: file.originalFilename,
+				filename: file.filename,
 				physicalFilename: path.normalize(path.resolve(file.path)),
 				encoding: '',
 				mimetype: file.type,
@@ -99,7 +99,7 @@ export function uploadFile(file: fileUploadType, docTableName: string, databaseC
 
 		const sql = `INSERT INTO ${docTableName} (name, mime_type, doc_size, dad_charset, last_updated, content_type, blob_content) VALUES (:name, :mime_type, :doc_size, 'ascii', SYSDATE, 'BLOB', :blob_content)`;
 		const bind = {
-			name: file.fieldValue,
+			name: file.filename,
 			mime_type: file.mimetype,
 			doc_size: file.size,
 			blob_content: {
