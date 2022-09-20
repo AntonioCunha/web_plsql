@@ -13,6 +13,7 @@ import express from 'express';
 import { oracleExpressMiddleware$options } from './config';
 
 type argObjType = { [key: string]: string | Array<string> };
+type validResType = { outBinds?: { ret: number } | undefined };
 
 /**
 * Invoke the Oracle procedure and return the page content
@@ -65,7 +66,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		:ret := case when a then 1 else 0 end;
     END;`;
 
-			const requestValidRes = await databaseConnection.execute(
+			const requestValidRes:validResType = await databaseConnection.execute(
 				query,
 				{
 					proc: procedure,
@@ -73,7 +74,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 				}
 			);
 
-			validOperation = requestValidRes.outBinds.ret === 1;
+			validOperation = requestValidRes.outBinds && requestValidRes.outBinds.ret ? requestValidRes.outBinds.ret === 1 : false;
 
 
 			if (!validOperation) {
