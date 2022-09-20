@@ -12,7 +12,7 @@ import {Trace} from './trace';
 import express from 'express';
 import {oracleExpressMiddleware$options} from './config';
 
-type argObjType = {[key: string]: string | Array<string>};
+type argObjType = { [key: string]: string | Array<string> };
 
 /**
 * Invoke the Oracle procedure and return the page content
@@ -49,7 +49,39 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	const para = await getProcedure(procedure, argObj, options, databaseConnection, trace);
 
 	//
-	//	3) EXECUTE PROCEDURE
+	// 3) Validate Procedure
+	//
+
+	const validationFunction = options.requestValidation || false;
+	if (validationFunction) {
+		// validate here
+		let validOperation = {};
+		const query = `DECLARE
+		a boolean;
+		ret number;
+    BEGIN
+        a := :vldFunc(:proc);
+		:ret := case when a then 1 else 0 end;
+    END;`;
+
+		validOperation = await databaseConnection.execute(
+			query,
+			{
+				vldFunc: validationFunction,
+				proc: procedure,
+				ret: {dir: oracledb.BIND_OUT, type: oracledb.NUMBER},
+			}
+		);
+
+
+		if (validOperation !== 1) {
+			/* istanbul ignore next */
+			throw new Error(`Invalid ${procedure} for ${options.requestValidation} validation funcion`);
+		}
+	}
+
+	//
+	//	4) EXECUTE PROCEDURE
 	//
 
 	const HTBUF_LEN = 63;
@@ -87,7 +119,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	}
 
 	//
-	//	4) PROCESS RESULTS
+	//	5) PROCESS RESULTS
 	//
 
 	// internal error
@@ -124,13 +156,13 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	trace.write(`PARSED CONTENT:\n${'-'.repeat(30)}\n${Trace.inspect(pageComponents)}\n${'-'.repeat(30)}`);
 
 	//
-	//	5) SEND THE RESPONSE
+	//	7) SEND THE RESPONSE
 	//
 
 	send(req, res, pageComponents, trace);
 
 	//
-	//	6) CLEANUP
+	//	8) CLEANUP
 	//
 
 	await fileBlob.close();
@@ -144,7 +176,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 * Report error in procedure
 */
 /* istanbul ignore next */
-function throwError(error: string, para: {sql: string; bind: any}, cgiObj: any, trace: Trace) {
+function throwError(error: string, para: { sql: string; bind: any }, cgiObj: any, trace: Trace) {
 	/* istanbul ignore next */
 	trace.write(error);
 	/* istanbul ignore next */
@@ -154,7 +186,7 @@ function throwError(error: string, para: {sql: string; bind: any}, cgiObj: any, 
 /*
 *	Get the procedure and arguments to execute
 */
-async function getProcedure(procedure: string, argObj: argObjType, options: oracleExpressMiddleware$options, databaseConnection: oracledb.Connection, trace: Trace): Promise<{sql: string; bind: any}> {
+async function getProcedure(procedure: string, argObj: argObjType, options: oracleExpressMiddleware$options, databaseConnection: oracledb.Connection, trace: Trace): Promise<{ sql: string; bind: any }> {
 	if (options.pathAlias && options.pathAlias.alias === procedure) {
 		trace.write(`getProcedure: path alias "${options.pathAlias.alias}" redirects to "${options.pathAlias.procedure}"`);
 		return Promise.resolve({
@@ -222,7 +254,7 @@ END;
 /*
 * Get the sql statement and bindings for the procedure to execute for a variable number of arguments
 */
-async function getVarArgsPara(procedure: string, argObj: argObjType): Promise<{sql: string; bind: any}> {
+async function getVarArgsPara(procedure: string, argObj: argObjType): Promise<{ sql: string; bind: any }> {
 	const names = [];
 	const values = [];
 
@@ -251,8 +283,8 @@ async function getVarArgsPara(procedure: string, argObj: argObjType): Promise<{s
 /*
 * Get the sql statement and bindings for the procedure to execute for a fixed number of arguments
 */
-async function getFixArgsPara(procedure: string, argObj: argObjType, databaseConnection: oracledb.Connection): Promise<{sql: string; bind: any}> {
-	const bind: {[key: string]: any} = {};
+async function getFixArgsPara(procedure: string, argObj: argObjType, databaseConnection: oracledb.Connection): Promise<{ sql: string; bind: any }> {
+	const bind: { [key: string]: any } = {};
 	let index = 0;
 
 	const argTypes = await getArguments(procedure, databaseConnection);
@@ -302,7 +334,7 @@ async function getFixArgsPara(procedure: string, argObj: argObjType, databaseCon
 *	This is important because if the procedure is defined to take a PL/SQL indexed table,
 *	we must provise a table, even if there is only one argument to be submitted.
 */
-async function getArguments(procedure: string, databaseConnection: oracledb.Connection): Promise<{[key: string]: string}> {
+async function getArguments(procedure: string, databaseConnection: oracledb.Connection): Promise<{ [key: string]: string }> {
 	const sql = [
 		'DECLARE',
 		'	schemaName		VARCHAR2(32767);',
@@ -331,7 +363,7 @@ async function getArguments(procedure: string, databaseConnection: oracledb.Conn
 	let result;
 
 	try {
-		result = await databaseConnection.execute<{names: Array<string>; types: Array<string>}>(sql.join('\n'), bind);
+		result = await databaseConnection.execute<{ names: Array<string>; types: Array<string> }>(sql.join('\n'), bind);
 	} catch (err) {
 		/* istanbul ignore next */
 		const message = `Error when retrieving arguments\n${sql.join('\n')}\n${err instanceof Error ? err.stack : ''}`;

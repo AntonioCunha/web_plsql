@@ -6,7 +6,7 @@ import {environmentType} from './cgi';
 export type oracleExpressMiddleware$options = {
 	defaultPage?: string;
 	doctable?: string;
-	requestValidation ?: string;
+	requestValidation?: string;
 	cgi?: environmentType;
 	pathAlias?: {
 		alias: string;
