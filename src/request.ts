@@ -4,13 +4,13 @@
 
 import util from 'util';
 import oracledb from 'oracledb';
-import {invokeProcedure} from './procedure';
-import {getCGI} from './cgi';
-import {getFiles} from './fileUpload';
-import {RequestError} from './requestError';
-import {Trace} from './trace';
+import { invokeProcedure } from './procedure';
+import { getCGI } from './cgi';
+import { getFiles } from './fileUpload';
+import { RequestError } from './requestError';
+import { Trace } from './trace';
 import express from 'express';
-import {oracleExpressMiddleware$options} from './config';
+import { oracleExpressMiddleware$options } from './config';
 
 /**
 * Process the request
@@ -43,23 +43,23 @@ export async function processRequest(req: express.Request, res: express.Response
 		trace.write('processRequest: Connection has been allocated');
 	} catch (err) {
 		/* istanbul ignore next */
-		throw new RequestError(`Unable to open database connection\n${err instanceof Error ? err.message: ''}`);
+		throw new RequestError(`Unable to open database connection\n${err instanceof Error ? err.message : ''}`);
 	}
 
-	// execute request
 	try {
+		// execute request
 		await executeRequest(req, res, options, databaseConnection, trace);
-	} catch (err) {
+	} catch (error) {
 		// close database connection
 		try {
 			await databaseConnection.release();
 			trace.write('processRequest: Connection has been released');
-		} catch (errDB) {
-		/* istanbul ignore next */
-			console.error(`Unable to release database connection\n${errDB instanceof Error ? errDB.message : ''}`);
+		} catch (err) {
+			/* istanbul ignore next */
+			console.error(`Unable to release database connection\n${err instanceof Error ? err.message : ''}`);
 		}
-		throw err;
 	}
+
 
 	// close database connection
 	try {
@@ -123,8 +123,8 @@ async function executeRequest(req: express.Request, res: express.Response, optio
 /*
 *	Normalize the body by making sure that only "simple" parameters and no nested objects are submitted
 */
-function normalizeBody(req: express.Request): {[key: string]: string} {
-	const args: {[key: string]: string} = {};
+function normalizeBody(req: express.Request): { [key: string]: string } {
+	const args: { [key: string]: string } = {};
 	/* istanbul ignore else */
 	if (typeof req.body === 'object') {
 		for (const key in req.body) {
@@ -134,7 +134,7 @@ function normalizeBody(req: express.Request): {[key: string]: string} {
 				args[key] = value;
 			} else {
 				/* istanbul ignore next */
-				throw new RequestError(`The element "${key}" in the body is not a string or an array of strings!\n` + util.inspect(req.body, {showHidden: false, depth: null, colors: false}));
+				throw new RequestError(`The element "${key}" in the body is not a string or an array of strings!\n` + util.inspect(req.body, { showHidden: false, depth: null, colors: false }));
 			}
 		}
 	}

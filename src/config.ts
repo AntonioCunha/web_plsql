@@ -6,6 +6,7 @@ import {environmentType} from './cgi';
 export type oracleExpressMiddleware$options = {
 	defaultPage?: string;
 	doctable?: string;
+	requestValidation ?: string;
 	cgi?: environmentType;
 	pathAlias?: {
 		alias: string;
@@ -32,7 +33,7 @@ export function validate(options: Record<string, any>): oracleExpressMiddleware$
 			throw new TypeError('Invalid configuration object was given');
 		}
 		Object.keys(options).forEach(option => {
-			if (['defaultPage', 'doctable', 'cgi', 'pathAlias', 'errorStyle', 'trace'].indexOf(option) === -1) {
+			if (['defaultPage', 'doctable', 'cgi', 'pathAlias', 'errorStyle', 'trace', 'requestValidation'].indexOf(option) === -1) {
 				throw new TypeError(`Invalid configuration options "${option}"`);
 			}
 		});
@@ -53,6 +54,14 @@ export function validate(options: Record<string, any>): oracleExpressMiddleware$
 			validOptions.doctable = options.doctable;
 		} else {
 			throw new TypeError('The option "doctable" must be of type string and cannot be empty');
+		}
+	}
+
+	if (typeof options.requestValidation !== 'undefined') {
+		if (typeof options.requestValidation === 'string' && options.requestValidation.length > 0) {
+			validOptions.requestValidation = options.requestValidation;
+		} else {
+			throw new TypeError('The option "requestValidation" must be of type string and cannot be empty');
 		}
 	}
 

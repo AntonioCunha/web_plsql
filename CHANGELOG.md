@@ -5,16 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [?.?.?] - 2021-??-??
+## [?.?.?] - ????-??-??
 
 ### Added
 ### Changed
 ### Fixed
 
 
-## [0.4.2] - 2022-01-17
+## [0.5.1] - 2022-09-11
 
-### Added
+### Fixed
+- Updated all dependencies.
+
+
+## [0.5.0] - 2022-05-09
+
+### Changed
+- Replaced mocha with jest.
+- Added support for node 18.
+
+### Fixed
+- Updated all dependencies.
+
+
+## [0.4.2] - 2022-01-17
 
 ### Changed
 - node.js support starting with v16.
@@ -24,10 +38,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## [0.4.1] - 2021-08-30
-
-### Added
-
-### Changed
 
 ### Fixed
 - Updated all dependencies.
@@ -59,8 +69,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## [0.2.0] - 2019-06-02
-
-### Added
 
 ## [0.2.0] - 2019-06-02
 
