@@ -50,14 +50,7 @@ export async function processRequest(req: express.Request, res: express.Response
 		// execute request
 		await executeRequest(req, res, options, databaseConnection, trace);
 	} catch (error) {
-		// close database connection
-		try {
-			await databaseConnection.release();
-			trace.write('processRequest: Connection has been released');
-		} catch (err) {
-			/* istanbul ignore next */
-			console.error(`Unable to release database connection\n${err instanceof Error ? err.message : ''}`);
-		}
+		trace.write('Error on executeRequest(req, res, options, databaseConnection, trace)');
 	}
 
 
