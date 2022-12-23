@@ -46,8 +46,15 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	//
 	// 2) GET SQL STATEMENT AND ARGUMENTS
 	//
-
-	const para = await getProcedure(procedure, argObj, options, databaseConnection, trace);
+	let para = {
+		sql: '',
+		bind: {}
+	};
+	try {
+		para = await getProcedure(procedure, argObj, options, databaseConnection, trace);
+	} catch (error) {
+		trace.write(error instanceof Error ? error.toString() : '');
+	}
 
 	//
 	// 3) Validate Procedure
