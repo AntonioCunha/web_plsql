@@ -81,7 +81,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			);
 
 			validOperation = requestValidRes.outBinds && requestValidRes.outBinds.ret ? requestValidRes.outBinds.ret === 1 : false;
-		} else {
+		} else if (para.sql !== '') {
 			validOperation = true;
 		}
 	} catch (error) {
