@@ -76,6 +76,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			validOperation = requestValidRes.outBinds && requestValidRes.outBinds.ret ? requestValidRes.outBinds.ret === 1 : false;
 		}
 	} catch (error) {
+		trace.write(error instanceof Error ? error.toString() : '');
 		throw new Error('Error during the validation of the procedure (RequestValidationFunction)');
 	}
 
@@ -124,6 +125,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			};
 		}
 	} catch (err) {
+		trace.write(err instanceof Error ? err.toString() : '');
 		/* istanbul ignore next */
 		throwError(`Error when executing procedure\n${sqlStatement}\n${err instanceof Error ? err.toString() : ''}`, para, cgiObj, trace);
 	}
@@ -134,12 +136,14 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 
 	// internal error
 	if (!result) {
+		trace.write('Error when retrieving rows');
 		/* istanbul ignore next */
 		throwError('Error when retrieving rows', para, cgiObj, trace);
 	}
 
 	// Make sure that we have retrieved all the rows
 	if (result.outBinds.irows > MAX_IROWS) {
+		trace.write(`Error when retrieving rows. irows="${result.outBinds.irows}"`);
 		/* istanbul ignore next */
 		throwError(`Error when retrieving rows. irows="${result.outBinds.irows}"`, para, cgiObj, trace);
 	}
