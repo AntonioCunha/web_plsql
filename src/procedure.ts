@@ -115,7 +115,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			trace.write(`results:\n${Trace.inspect(result)}`);
 		} else {
 			result = {
-				outbinds: {
+				outBinds: {
 					lines: ['No access to this.'],
 					fileBlob: null,
 					fileType: null,
