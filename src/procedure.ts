@@ -74,6 +74,8 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			);
 
 			validOperation = requestValidRes.outBinds && requestValidRes.outBinds.ret ? requestValidRes.outBinds.ret === 1 : false;
+		} else {
+			validOperation = true;
 		}
 	} catch (error) {
 		trace.write(error instanceof Error ? error.toString() : '');
