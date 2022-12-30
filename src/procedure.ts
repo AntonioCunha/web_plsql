@@ -86,7 +86,6 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		}
 	} catch (error) {
 		trace.write(error instanceof Error ? error.toString() : '');
-		throw new Error('Error during the validation of the procedure (RequestValidationFunction)');
 	}
 
 	//
@@ -94,7 +93,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	//
 
 	const HTBUF_LEN = 63;
-	const MAX_IROWS = 100000;
+	const MAX_IROWS = 1000000000000000;
 
 	const cgi = {
 		keys: Object.keys(cgiObj),
@@ -135,8 +134,14 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		}
 	} catch (err) {
 		trace.write(err instanceof Error ? err.toString() : '');
-		/* istanbul ignore next */
-		throwError(`Error when executing procedure\n${sqlStatement}\n${err instanceof Error ? err.toString() : ''}`, para, cgiObj, trace);
+		result = {
+			outBinds: {
+				lines: ['Error while executing sql procedure'],
+				fileBlob: null,
+				fileType: null,
+				fileSize: null
+			}
+		};
 	}
 
 	//
@@ -147,14 +152,19 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	if (!result) {
 		trace.write('Error when retrieving rows');
 		/* istanbul ignore next */
-		throwError('Error when retrieving rows', para, cgiObj, trace);
+		result = {
+			outBinds: {
+				lines: ['No result'],
+				fileBlob: null,
+				fileType: null,
+				fileSize: null
+			}
+		};
 	}
 
 	// Make sure that we have retrieved all the rows
 	if (result.outBinds.irows > MAX_IROWS) {
 		trace.write(`Error when retrieving rows. irows="${result.outBinds.irows}"`);
-		/* istanbul ignore next */
-		throwError(`Error when retrieving rows. irows="${result.outBinds.irows}"`, para, cgiObj, trace);
 	}
 
 	// combine page
