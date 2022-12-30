@@ -93,7 +93,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	//
 
 	const HTBUF_LEN = 63;
-	const MAX_IROWS = 1000000000000000;
+	const MAX_IROWS = 100000;
 
 	const cgi = {
 		keys: Object.keys(cgiObj),
