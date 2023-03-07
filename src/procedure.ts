@@ -56,19 +56,12 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	};
 	try {
 		const newData: ArgObject = {};
-
 		for (const key in argObj) {
-			if (argObj.hasOwnProperty(key)) {
-				const lowerKey = key.toLowerCase();
-				if (Array.isArray(argObj[key])) {
-					if (newData[lowerKey]) {
-						newData[lowerKey] = newData[lowerKey].concat(argObj[key] as string);
-					} else {
-						newData[lowerKey] = argObj[key];
-					}
-				} else {
-					newData[lowerKey] = argObj[key];
-				}
+			let lowerKey = key.toLowerCase();
+			if (newData[lowerKey]) {
+				newData[lowerKey] = newData[lowerKey].concat(argObj[key] as string);
+			} else {
+				newData[lowerKey] = argObj[key];
 			}
 		}
 		para = await getProcedure(procedure, argObj, options, databaseConnection, trace);
