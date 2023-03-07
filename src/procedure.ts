@@ -3,14 +3,14 @@
 */
 
 import oracledb from 'oracledb';
-import {streamToBuffer} from './stream';
-import {uploadFiles, filesUploadType} from './fileUpload';
-import {parse, send} from './page';
-import {ProcedureError} from './procedureError';
-import {RequestError} from './requestError';
-import {Trace} from './trace';
+import { streamToBuffer } from './stream';
+import { uploadFiles, filesUploadType } from './fileUpload';
+import { parse, send } from './page';
+import { ProcedureError } from './procedureError';
+import { RequestError } from './requestError';
+import { Trace } from './trace';
 import express from 'express';
-import {oracleExpressMiddleware$options} from './config';
+import { oracleExpressMiddleware$options } from './config';
 
 type argObjType = { [key: string]: string | Array<string> };
 type validResType = { outBinds?: { ret: number } | undefined };
@@ -57,14 +57,19 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	try {
 		const newData: ArgObject = {};
 		for (const key in argObj) {
-			let lowerKey = key.toLowerCase();
-			if (newData[lowerKey]) {
-				newData[lowerKey] = newData[lowerKey].concat(argObj[key] as string);
+			const lowerKey = key.toLowerCase();
+			const value = argObj[key];
+			if (Array.isArray(value)) {
+				if (newData[lowerKey]) {
+					newData[lowerKey] = newData[lowerKey].concat(argObj[key] as string);
+				} else {
+					newData[lowerKey] = value;
+				}
 			} else {
-				newData[lowerKey] = argObj[key];
+				newData[lowerKey] = [value];
 			}
 		}
-		para = await getProcedure(procedure, argObj, options, databaseConnection, trace);
+		para = await getProcedure(procedure, newData, options, databaseConnection, trace);
 	} catch (error) {
 		trace.write(error instanceof Error ? error.toString() : '');
 	}
@@ -89,7 +94,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 				query,
 				{
 					proc: procedure,
-					ret: {dir: oracledb.BIND_OUT, type: oracledb.NUMBER},
+					ret: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
 				}
 			);
 
@@ -116,15 +121,15 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	const fileBlob = await databaseConnection.createLob(oracledb.BLOB);
 
 	const bind = {
-		cgicount: {dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: cgi.keys.length},
-		cginames: {dir: oracledb.BIND_IN, type: oracledb.STRING, val: cgi.keys},
-		cgivalues: {dir: oracledb.BIND_IN, type: oracledb.STRING, val: cgi.values},
-		htbuflen: {dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: HTBUF_LEN},
-		fileType: {dir: oracledb.BIND_OUT, type: oracledb.STRING},
-		fileSize: {dir: oracledb.BIND_OUT, type: oracledb.NUMBER},
-		fileBlob: {dir: oracledb.BIND_INOUT, type: oracledb.BLOB, val: fileBlob},
-		lines: {dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: HTBUF_LEN * 2, maxArraySize: MAX_IROWS},
-		irows: {dir: oracledb.BIND_INOUT, type: oracledb.NUMBER, val: MAX_IROWS}
+		cgicount: { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: cgi.keys.length },
+		cginames: { dir: oracledb.BIND_IN, type: oracledb.STRING, val: cgi.keys },
+		cgivalues: { dir: oracledb.BIND_IN, type: oracledb.STRING, val: cgi.values },
+		htbuflen: { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: HTBUF_LEN },
+		fileType: { dir: oracledb.BIND_OUT, type: oracledb.STRING },
+		fileSize: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+		fileBlob: { dir: oracledb.BIND_INOUT, type: oracledb.BLOB, val: fileBlob },
+		lines: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: HTBUF_LEN * 2, maxArraySize: MAX_IROWS },
+		irows: { dir: oracledb.BIND_INOUT, type: oracledb.NUMBER, val: MAX_IROWS }
 	};
 
 	// execute procedure and retrieve page
@@ -238,7 +243,7 @@ async function getProcedure(procedure: string, argObj: argObjType, options: orac
 		return Promise.resolve({
 			sql: options.pathAlias.procedure + '(p_path=>:p_path);',
 			bind: {
-				'p_path': {dir: oracledb.BIND_IN, type: oracledb.STRING, val: procedure}
+				'p_path': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: procedure }
 			}
 		});
 	} else if (procedure.substring(0, 1) === '!') {
@@ -320,8 +325,8 @@ async function getVarArgsPara(procedure: string, argObj: argObjType): Promise<{ 
 	return Promise.resolve({
 		sql: procedure.substring(1) + '(:argnames, :argvalues);',
 		bind: {
-			argnames: {dir: oracledb.BIND_IN, type: oracledb.STRING, val: names},
-			argvalues: {dir: oracledb.BIND_IN, type: oracledb.STRING, val: values}
+			argnames: { dir: oracledb.BIND_IN, type: oracledb.STRING, val: names },
+			argvalues: { dir: oracledb.BIND_IN, type: oracledb.STRING, val: values }
 		}
 	});
 }
@@ -351,7 +356,7 @@ async function getFixArgsPara(procedure: string, argObj: argObjType, databaseCon
 		sql += key + '=>:' + parameterName;
 
 		// add the binding
-		bind[parameterName] = {dir: oracledb.BIND_IN, type: oracledb.STRING};
+		bind[parameterName] = { dir: oracledb.BIND_IN, type: oracledb.STRING };
 
 		// set the value or array of values
 		if (Array.isArray(value) || argTypes[key] === 'PL/SQL TABLE') {
@@ -401,9 +406,9 @@ async function getArguments(procedure: string, databaseConnection: oracledb.Conn
 	const MAX_PARAMETER_NUMBER = 1000;
 
 	const bind = {
-		name: {dir: oracledb.BIND_IN, type: oracledb.STRING, val: procedure},
-		names: {dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 60, maxArraySize: MAX_PARAMETER_NUMBER},
-		types: {dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 60, maxArraySize: MAX_PARAMETER_NUMBER}
+		name: { dir: oracledb.BIND_IN, type: oracledb.STRING, val: procedure },
+		names: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 60, maxArraySize: MAX_PARAMETER_NUMBER },
+		types: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 60, maxArraySize: MAX_PARAMETER_NUMBER }
 	};
 
 	let result;
