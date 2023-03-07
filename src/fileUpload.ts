@@ -43,20 +43,20 @@ export function getFiles(req: express.Request): filesUploadType {
 		const file = customRequest.files[key];
 
 		/* istanbul ignore else */
-		if (typeof file.originalFilename === 'string' && file.originalFilename.length > 0) {
+		if (typeof file.originalname === 'string' && file.originalname.length > 0) {
 			// get a temporary filename
-			const filename = getRandomizedFilename(file.originalFilename);
+			const filename = getRandomizedFilename(file.originalname);
 
 			// Add the field
 			file.filename = filename;
 
 			// Add the file to upload
 			files.push({
-				fieldValue: file.fieldName,
-				filename: file.filename,
+				fieldValue: file.fieldname,
+				filename: file.originalname,
 				physicalFilename: path.normalize(path.resolve(file.path)),
 				encoding: '',
-				mimetype: file.type,
+				mimetype: file.mimetype,
 				size: file.size
 			});
 		}
@@ -108,12 +108,15 @@ export function uploadFile(file: fileUploadType, docTableName: string, databaseC
 			}
 		};
 
-		databaseConnection.execute(sql, bind, {autoCommit: true})
+		databaseConnection.execute(sql, bind, { autoCommit: true })
 			.then(() => {
 				resolve();
 			}).catch(/* istanbul ignore next */(e: any) => {
 				reject(new Error(`Unable to insert file "${file.physicalFilename}"\n` + e.toString()));
 			});
+
+		// apagar ficheiro
+		fs.unlinkSync(file.physicalFilename);
 	});
 }
 
