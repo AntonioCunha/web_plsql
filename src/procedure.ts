@@ -36,6 +36,10 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 	trace.write('invokeProcedure: ENTER');
 
 	const procedure = req.params.name;
+	let procedureValidFunc = String(procedure);
+	if (procedure.length > 0 && procedure[0] === '!') {
+		procedureValidFunc = procedure.slice(1, procedure.length);
+	}
 
 	//
 	// 1) UPLOAD FILES
@@ -103,7 +107,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			const requestValidRes: validResType = await databaseConnection.execute(
 				query,
 				{
-					proc: procedure,
+					proc: procedureValidFunc,
 					ret: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
 				}
 			);
