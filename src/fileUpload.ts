@@ -53,7 +53,7 @@ export function getFiles(req: express.Request): filesUploadType {
 			// Add the file to upload
 			files.push({
 				fieldValue: file.fieldname,
-				filename: file.originalname,
+				filename: file.filename,
 				physicalFilename: path.normalize(path.resolve(file.path)),
 				encoding: '',
 				mimetype: file.mimetype,
