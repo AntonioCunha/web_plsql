@@ -96,11 +96,19 @@ async function executeRequest(req: express.Request, res: express.Response, optio
 		throw new RequestError(error);
 	}
 
+	// Add list of files to the arguments
+	for (const f of filesToUpload) {
+		if (!argObj[f.fieldValue]) {
+			argObj[f.fieldValue] = [];
+		}
+		argObj[f.fieldValue].push(f.filename);
+	}
+
 	// Add the files to the arguments
-	filesToUpload.reduce((aggregator, file) => {
-		aggregator[file.fieldValue] = file.filename;
-		return aggregator;
-	}, argObj);
+	// filesToUpload.reduce((aggregator, file) => {
+	// 	aggregator[file.fieldValue] = file.filename;
+	// 	return aggregator;
+	// }, argObj);
 
 	// Does the request contain a body
 	Object.assign(argObj, normalizeBody(req));
