@@ -19,6 +19,60 @@ interface ArgObject {
 	[key: string]: string | Array<string>;
 }
 
+const getResponseHtml = (message = '') => {
+
+    return `<html lang="pt"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Sysnovare - Problema de conecção</title>
+<link rel="shortcut icon" href="sysnovare-favicon-16x16.png" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""> 
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+  body{
+    margin:0;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+  }
+  main{
+    padding:2rem 0;
+    text-align: center;
+  }
+  main img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+  }
+  .logo{
+    max-width: 250px;
+  }
+  h1{
+    font-weight: 700;
+    color:#175eb8;
+  }
+  p{
+    color:#777;
+  }
+  p.erro{
+    color:#e74c3c
+  }
+</style>
+</head>
+<body>
+<main>
+    <img class="logo" src="imagensapi/logotipo.png">
+    <img src="imagensapi/error-img.png">
+    <h1>Ocorreu um erro de comunicação com o servidor</h1>
+    <p>Resolveremos o constrangimento o mais rápido possível. </p>
+    <p class="erro">Erro: ${message}</p>
+</main>
+
+</body></html>`
+};
+
 /**
 * Invoke the Oracle procedure and return the page content
 *
@@ -164,7 +218,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 				}
 			};
 
-			errorMessage += '<h3>This operation does not exist or there is no access to this.</h3>';
+			errorMessage += 'This operation does not exist or there is no access to this.';
 		}
 	} catch (err) {
 		trace.write(err instanceof Error ? err.toString() : '');
@@ -177,8 +231,8 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			}
 		};
 
-		errorMessage += '<h1>Error while executing sql procedure</h1>';
-		errorMessage += `<h4>${err}</h4>`;
+		errorMessage += 'Error while executing sql procedure';
+		errorMessage += `${err}`;
 	}
 
 	//
@@ -198,7 +252,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			}
 		};
 
-		errorMessage += '<h4>No result</h4>';
+		errorMessage += 'No result';
 	}
 
 	// Make sure that we have retrieved all the rows
@@ -225,15 +279,10 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			if (options.errorStyle === 'debug') {
 
 				// se o error style for debug mostrar o erro exato
-				pageComponents.body = errorMessage;
+				pageComponents.body = getResponseHtml(errorMessage);
 			} else {
 				// caso contrário, mostrar mensagem por defeito
-				pageComponents.body = `
-				<h2>Problem occurred</h2>
-				<div>Unfortunately, an error occurred with your request.</div>
-				</p>
-				<div>Please try again later or contact technical support.</div>
-				`
+				pageComponents.body = getResponseHtml('Please try again later or contact technical support.');
 			}
 		}
 	}
