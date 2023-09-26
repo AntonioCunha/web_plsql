@@ -65,9 +65,8 @@ const getResponseHtml = (message = '') => {
 <main>
     <img class="logo" src="imagensapi/logotipo.png">
     <img src="imagensapi/error-img.png">
-    <h1>Ocorreu um erro de comunicação com o servidor</h1>
-    <p>Resolveremos o constrangimento o mais rápido possível. </p>
-    <p class="erro">Erro: ${message}</p>
+    <h1>Ocorreu um erro</h1>
+    <p class="erro">${message}</p>
 </main>
 
 </body></html>`
@@ -279,10 +278,10 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			if (options.errorStyle === 'debug') {
 
 				// se o error style for debug mostrar o erro exato
-				pageComponents.body = getResponseHtml(errorMessage);
+				pageComponents.body =  getResponseHtml('Erro: ' + errorMessage);
 			} else {
 				// caso contrário, mostrar mensagem por defeito
-				pageComponents.body = getResponseHtml('Please try again later or contact technical support.');
+				pageComponents.body = getResponseHtml('');
 			}
 		}
 	}
