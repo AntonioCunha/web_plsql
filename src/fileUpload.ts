@@ -2,10 +2,20 @@
 *	Process file uploads
 */
 
+import iconv from 'iconv-lite';
 import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import oracledb from 'oracledb';
+
+
+function convertISO15ToUTF8(iso15String: string): string {
+	// Convert ISO-8859-15 to UTF-8
+    const utf8Buffer = iconv.encode(iso15String, 'ISO-8859-15');
+
+    // Convert the Buffer to a UTF-8 string
+    return utf8Buffer.toString('utf-8');
+}
 
 export type fileUploadType = {
 	fieldValue: string;
@@ -52,7 +62,7 @@ export function getFiles(req: express.Request): filesUploadType {
 
 			// Add the file to upload
 			files.push({
-				fieldValue: file.fieldname,
+				fieldValue: convertISO15ToUTF8(file.fieldname),
 				filename: file.filename,
 				physicalFilename: path.normalize(path.resolve(file.path)),
 				encoding: '',
