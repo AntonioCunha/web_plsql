@@ -62,8 +62,8 @@ export function getFiles(req: express.Request): filesUploadType {
 
 			// Add the file to upload
 			files.push({
-				fieldValue: convertISO15ToUTF8(file.fieldname),
-				filename: file.filename,
+				fieldValue: file.fieldname,
+				filename: convertISO15ToUTF8(file.filename),
 				physicalFilename: path.normalize(path.resolve(file.path)),
 				encoding: '',
 				mimetype: file.mimetype,
