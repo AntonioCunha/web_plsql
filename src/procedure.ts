@@ -100,7 +100,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 
 	trace.write(`invokeProcedure: upload "${filesToUpload.length}" files`);
 	/* istanbul ignore else */
-	if (typeof options.doctable === 'string' && options.doctable.length > 0) {
+	if (typeof options.doctable === 'string' && options.doctable.length > 0 && filesToUpload.length > 0) {
 		uploadFiles(filesToUpload, options.doctable, databaseConnection);
 	}
 
