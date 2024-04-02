@@ -127,7 +127,8 @@ async function executeRequest(req: express.Request, res: express.Response, optio
 function normalizeBody(req: express.Request): { [key: string]: string } {
 	const args: { [key: string]: string } = {};
 
-	const body = req.rawBody && req.rawBody.includes('soapenv') ? req.rawBody : req.body;
+	const body = Object.keys(req).includes('rawBody') && req['rawBody'].length > 0 && req['rawBody'].includes('soapenv') ? req['rawBody'] : req.body;
+
 	/* istanbul ignore else */
 	if (typeof body === 'object') {
 		for (const key in req.body) {

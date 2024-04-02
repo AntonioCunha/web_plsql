@@ -20,5 +20,8 @@
   "include": [
     "src/**/*",
     "test/**/*"
+  ],
+  "files": [
+    "typings/express.d.ts"
   ]
 }
