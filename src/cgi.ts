@@ -38,7 +38,7 @@ export function getCGI(req: express.Request, options: oracleExpressMiddleware$op
 		'HTTP_COOKIE': getCookieString(req),
 		'HTTP_USER_AGENT': req.get('user-agent') || '',
 		'HTTP_SOAPACTION': req.get('SOAPAction') || '',
-        'SOAP_BODY': req.get('rawBody') || '',
+        'SOAP_BODY': req.body && typeof req.body === 'string' && req.body.replace(/\s+/g, '').startsWith('<') && req.body.replace(/\s+/g, '').endsWith('>') ? req.body : '',
 		'HTTP_HOST': req.get('host') || '',
 		'HTTP_ACCEPT': req.get('accept') || '',
 		'HTTP_ACCEPT_ENCODING': req.get('accept-encoding') || '',

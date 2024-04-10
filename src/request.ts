@@ -127,10 +127,8 @@ async function executeRequest(req: express.Request, res: express.Response, optio
 function normalizeBody(req: express.Request): { [key: string]: string } {
 	const args: { [key: string]: string } = {};
 
-	const body = req.get('rawBody') || req.body;
-
 	/* istanbul ignore else */
-	if (typeof body === 'object') {
+	if (typeof req.body === 'object') {
 		for (const key in req.body) {
 			const value = req.body[key];
 			/* istanbul ignore else */
