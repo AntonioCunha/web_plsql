@@ -138,6 +138,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		para = await getProcedure(procedure, newData, options, databaseConnection, trace);
 	} catch (error) {
 		trace.write(error instanceof Error ? error.toString() : '');
+		trace.error(error instanceof Error ? error.toString() : '');
 	}
 
 	//
@@ -170,6 +171,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		}
 	} catch (error) {
 		trace.write(error instanceof Error ? error.toString() : '');
+		trace.error(error instanceof Error ? error.toString() : '');
 	}
 
 	//
@@ -221,6 +223,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		}
 	} catch (err) {
 		trace.write(err instanceof Error ? err.toString() : '');
+		trace.error(err instanceof Error ? err.toString() : '');
 		result = {
 			outBinds: {
 				lines: ['Error while executing sql procedure'],

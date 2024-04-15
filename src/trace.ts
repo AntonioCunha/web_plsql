@@ -106,6 +106,33 @@ export class Trace {
 	}
 
 	/**
+	 * Write an error message to the log file.
+	 * @param text - The error message.
+	 */
+	error(text: string): void {
+
+		try {
+			const currentDate = new Date();
+			const year = currentDate.getFullYear();
+			const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+			const day = String(currentDate.getDate()).padStart(2, '0');
+			const formattedDate = `${year}${month}${day}`;
+
+			// name of log file
+			const logFile = path.resolve('logs', `${formattedDate}.log`);
+
+			// construcao de texto
+			const finalText = `\n=====================\n
+			${getTimestamp()}:\n${trimRight(text)}\n${SEPARATOR_LINE}
+			\n=====================\n`;
+			appendSync(logFile, finalText);
+		} catch (e) {
+			// istanbul ignore next
+			console.error(e);
+		}
+	}
+
+	/**
 	* Return a string representation of the value.
 	*
 	* @param {unknown} value - Any value.
