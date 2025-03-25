@@ -9,7 +9,7 @@ import {parse, send} from './page';
 import {ProcedureError} from './procedureError';
 import {RequestError} from './requestError';
 import {Trace} from './trace';
-import logger from './Logger';
+import logger from './logger';
 import express from 'express';
 import {oracleExpressMiddleware$options} from './config';
 
