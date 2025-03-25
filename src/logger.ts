@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { createRollingFileLogger } from 'simple-node-logger';
+import { createSimpleLogger } from 'simple-node-logger';
 
 class Logger {
   private static instance: Logger;
@@ -12,15 +12,13 @@ class Logger {
       fs.mkdirSync(logDir, { recursive: true });
     }
 
-
-    this.logger = createRollingFileLogger({
-      logDirectory: logDir,
-      fileNamePattern: 'YYYYMMDD.log',
+    const logFileName = `${new Date().toISOString().split('T')[0].replace(/-/g, '')}.log`;
+    const logFilePath = path.join(logDir, logFileName);
+    
+    this.logger = createSimpleLogger({
+      logFilePath,
       timestampFormat: 'YYYY-MM-DD HH:mm:ss.SSS'
     });
-
-    // Remover saída para a consola
-    this.logger.removeConsoleAppender();
   }
 
   public static getInstance(): Logger {
