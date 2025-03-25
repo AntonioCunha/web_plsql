@@ -9,6 +9,7 @@ import {parse, send} from './page';
 import {ProcedureError} from './procedureError';
 import {RequestError} from './requestError';
 import {Trace} from './trace';
+import logger from './Logger';
 import express from 'express';
 import {oracleExpressMiddleware$options} from './config';
 
@@ -137,6 +138,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		}
 		para = await getProcedure(procedure, newData, options, databaseConnection, trace);
 	} catch (error) {
+		logger.error(error instanceof Error ? error.stack ?? '' : '');
 		trace.write(error instanceof Error ? error.toString() : '');
 		trace.error(error instanceof Error ? error.toString() : '');
 	}
@@ -170,6 +172,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			validOperation = true;
 		}
 	} catch (error) {
+		logger.error(error instanceof Error ? error.stack ?? '' : '');
 		trace.write(error instanceof Error ? error.toString() : '');
 		trace.error(error instanceof Error ? error.toString() : '');
 	}
@@ -222,6 +225,7 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 			errorMessage += 'This operation does not exist or there is no access to this.';
 		}
 	} catch (err) {
+		logger.error(err instanceof Error ? err.stack ?? '' : '');
 		trace.write(err instanceof Error ? err.toString() : '');
 		trace.error(err instanceof Error ? err.toString() : '');
 		result = {
@@ -278,6 +282,14 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 
 		// caso exista mensagem de erro, anexar essa mensagem no body
 		if (errorMessage && errorMessage.length > 0) {
+
+			// imprimir erro no log
+			logger.error('\n\n\n\n');
+			logger.error('Ocorreu um erro ao executar a procedure: ' + procedure);
+			logger.error('\n');
+			logger.error(errorMessage);
+			logger.error('\n\n\n\n');
+
 			if (options.errorStyle === 'debug') {
 
 				// se o error style for debug mostrar o erro exato
