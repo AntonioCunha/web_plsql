@@ -55,6 +55,7 @@
 	  "cookie-parser": "1.4.6",
 	  "escape-html": "1.0.3",
 	  "express": "4.18.1",
+	  "simple-node-logger": "21.8.12",
 	  "express-status-monitor": "1.3.4",
 	  "http-parser-js": "0.5.8",
 	  "mkdirp": "1.0.4",
