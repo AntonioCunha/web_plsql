@@ -283,13 +283,6 @@ export async function invokeProcedure(req: express.Request, res: express.Respons
 		// caso exista mensagem de erro, anexar essa mensagem no body
 		if (errorMessage && errorMessage.length > 0) {
 
-			// imprimir erro no log
-			logger.error('\n\n\n\n');
-			logger.error('Ocorreu um erro ao executar a procedure: ' + procedure);
-			logger.error('\n');
-			logger.error(errorMessage);
-			logger.error('\n\n\n\n');
-
 			if (options.errorStyle === 'debug') {
 
 				// se o error style for debug mostrar o erro exato
