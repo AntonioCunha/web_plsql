@@ -20,6 +20,7 @@ export function getCGI(req: express.Request, options: oracleExpressMiddleware$op
 	const CHARSET = 'UTF8';
 	const IANA_CHARSET = 'UTF-8';
 	const PATH = getPath(req);
+	const QUERY_STRING = getQueryString(req);
 
 	const DEFAULT_CGI: environmentType = {
 		'PLSQL_GATEWAY': 'WebDb',
@@ -52,7 +53,8 @@ export function getCGI(req: express.Request, options: oracleExpressMiddleware$op
 		'PATH_ALIAS': '',
 		'REQUEST_CHARSET': CHARSET,
 		'REQUEST_IANA_CHARSET': IANA_CHARSET,
-		'SCRIPT_PREFIX': PATH.prefix
+		'SCRIPT_PREFIX': PATH.prefix,
+		'QUERY_STRING': QUERY_STRING
 	};
 
 	return Object.assign(DEFAULT_CGI, options.cgi);
@@ -87,6 +89,11 @@ function getPath(req: express.Request): {script: string; prefix: string; dad: st
 	const dad = tmp.substr(tmp.indexOf('/') + 1);
 
 	return {script,	prefix, dad};
+}
+
+function getQueryString(req: express.Request): string {
+
+	return req.originalUrl.split('?')[1] || '';
 }
 
 /*
