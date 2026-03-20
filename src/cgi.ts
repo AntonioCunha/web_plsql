@@ -53,9 +53,12 @@ export function getCGI(req: express.Request, options: oracleExpressMiddleware$op
 		'PATH_ALIAS': '',
 		'REQUEST_CHARSET': CHARSET,
 		'REQUEST_IANA_CHARSET': IANA_CHARSET,
-		'SCRIPT_PREFIX': PATH.prefix,
-		'QUERY_STRING': QUERY_STRING
+		'SCRIPT_PREFIX': PATH.prefix
 	};
+
+	if (QUERY_STRING) {
+		DEFAULT_CGI.QUERY_STRING = QUERY_STRING;
+	}
 
 	return Object.assign(DEFAULT_CGI, options.cgi);
 }
