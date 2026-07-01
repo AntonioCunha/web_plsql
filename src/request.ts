@@ -98,11 +98,15 @@ async function executeRequest(req: express.Request, res: express.Response, optio
 
 	// Add list of files to the arguments
 	for (const f of filesToUpload) {
-		if (!argObj[f.fieldValue]) {
-			argObj[f.fieldValue] = [];
+		if (argObj[f.fieldValue] === undefined) {
+			argObj[f.fieldValue] = f.filename;                       // escalar → 1 ficheiro
+		} else if (Array.isArray(argObj[f.fieldValue])) {
+			argObj[f.fieldValue].push(f.filename);                   // já é array
+		} else {
+			argObj[f.fieldValue] = [argObj[f.fieldValue], f.filename]; // promove a array
 		}
-		argObj[f.fieldValue].push(f.filename);
 	}
+
 
 	// Add the files to the arguments
 	// filesToUpload.reduce((aggregator, file) => {
